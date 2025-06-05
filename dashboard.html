@@ -4,15 +4,40 @@
   <meta charset="UTF-8" />
   <title>Dashboard</title>
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Variant styles */
+    #payBtn-green {
+      background-color: green;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #payBtn-red {
+      background-color: red;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="dashboard">
     <h2>Welcome, <span id="user"></span>!</h2>
-    <button id="payBtn">Pay</button>
+
+    <!-- Variant A: Green Pay button -->
+    <button id="payBtn-green" data-ab-variant="A" style="display:none;">Pay</button>
+
+    <!-- Variant B: Red Pay button -->
+    <button id="payBtn-red" data-ab-variant="B" style="display:none;">Pay</button>
+
     <button id="logoutBtn">Logout</button>
   </div>
 
   <script>
+    // User login check
     const username = localStorage.getItem('username');
     if (!username) {
       alert('Please login first.');
@@ -21,10 +46,36 @@
       document.getElementById('user').innerText = username;
     }
 
-    document.getElementById('payBtn').addEventListener('click', function() {
+    // A/B testing snippet for pay button color
+    (function() {
+      const experiment = "pay_button_color";
+      const variants = ["A", "B"];
+
+      let variant = localStorage.getItem("ab-" + experiment);
+      if (!variant) {
+        variant = variants[Math.floor(Math.random() * variants.length)];
+        localStorage.setItem("ab-" + experiment, variant);
+      }
+
+      document.documentElement.setAttribute("data-ab-" + experiment, variant);
+
+      // Show the button variant matching the assigned variant
+      document.querySelectorAll("[data-ab-variant]").forEach(el => {
+        el.style.display = (el.getAttribute("data-ab-variant") === variant) ? "" : "none";
+      });
+    })();
+
+    // Event listener for the visible Pay button
+    function redirectToPayment() {
       window.location.href = 'payment-success.html';
+    }
+
+    // Attach click listener to whichever Pay button is visible
+    document.querySelectorAll("[data-ab-variant]").forEach(el => {
+      el.addEventListener('click', redirectToPayment);
     });
 
+    // Logout button listener
     document.getElementById('logoutBtn').addEventListener('click', function() {
       localStorage.removeItem('username');
       window.location.href = 'index.html';
