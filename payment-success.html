@@ -1,14 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Payment Success</title>
-  <link rel="stylesheet" href="css/styles.css" />
-</head>
-<body>
-  <div class="payment-success">
-    <h2>You have paid..thanks for the payment!</h2>
-    <a href="dashboard.html">Back to Dashboard</a>
-  </div>
-</body>
-</html>
+<!-- payment-success.html -->
+<div id="payment-success">Thanks for your payment!</div>
+
+<script>
+  const testId = localStorage.getItem("ab_test_id");
+  const variant = localStorage.getItem(`ab_test_${testId}`);
+
+  if (testId && variant && document.querySelector('#payment-success')) {
+    fetch("http://localhost:8000/api/events/goal", {
+      method: "POST",
+      body: JSON.stringify({
+        test_id: parseInt(testId),
+        variant: variant,
+        timestamp: new Date().toISOString(),
+        page_url: window.location.href
+      }),
+      headers: { "Content-Type": "application/json" }
+    }).then(() => console.log("Goal logged"))
+      .catch(err => console.error("Goal error", err));
+  }
+</script>

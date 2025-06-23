@@ -1,35 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<script>
-  (function() {
-    var script = document.createElement('script');
-    script.src = "https://yourcdn.com/ab.js?test_id=2";
-    script.async = true;
-    document.head.appendChild(script);
-  })();
-</script>
-
   <meta charset="UTF-8" />
   <title>Dashboard</title>
   <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- Inject ab.js -->
+  
+
   <style>
-    /* Variant styles */
-    #payBtn-green {
-      background-color: green;
-      color: white;
+    /* Common Pay button styles */
+    #payBtn {
       padding: 10px 20px;
       border: none;
       cursor: pointer;
+      display: none;
     }
 
-    #payBtn-red {
+    #payBtn.green {
+      background-color: green;
+      color: white;
+    }
+
+    #payBtn.red {
       background-color: red;
       color: white;
-      padding: 10px 20px;
-      border: none;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -37,17 +32,13 @@
   <div class="dashboard">
     <h2>Welcome, <span id="user"></span>!</h2>
 
-    <!-- Variant A: Green Pay button -->
-    <button id="payBtn-green" data-ab-variant="A" style="display:none;">Pay</button>
-
-    <!-- Variant B: Red Pay button -->
-    <button id="payBtn-red" data-ab-variant="B" style="display:none;">Pay</button>
-
+    <!-- One single pay button -->
+    <button id="payBtn">Pay</button>
     <button id="logoutBtn">Logout</button>
   </div>
 
   <script>
-    // User login check
+    // ✅ Login check
     const username = localStorage.getItem('username');
     if (!username) {
       alert('Please login first.');
@@ -56,37 +47,31 @@
       document.getElementById('user').innerText = username;
     }
 
-    // A/B testing snippet for pay button color
-    (function() {
-      const experiment = "pay_button_color";
-      const variants = ["A", "B"];
+    // ✅ Variant handler after ab.js loads
+    window.ABTestReady = function (variant, config) {
+      const payBtn = document.getElementById('payBtn');
 
-      let variant = localStorage.getItem("ab-" + experiment);
-      if (!variant) {
-        variant = variants[Math.floor(Math.random() * variants.length)];
-        localStorage.setItem("ab-" + experiment, variant);
+      // Remove existing color classes
+      payBtn.classList.remove('green', 'red');
+
+      // Apply variant styling
+      if (variant === 'A') {
+        payBtn.classList.add('green');
+      } else {
+        payBtn.classList.add('red');
       }
 
-      document.documentElement.setAttribute("data-ab-" + experiment, variant);
+      // Show the button
+      payBtn.style.display = 'inline-block';
+    };
 
-      // Show the button variant matching the assigned variant
-      document.querySelectorAll("[data-ab-variant]").forEach(el => {
-        el.style.display = (el.getAttribute("data-ab-variant") === variant) ? "" : "none";
-      });
-    })();
-
-    // Event listener for the visible Pay button
-    function redirectToPayment() {
+    // ✅ Pay button click = triggers goal page (ab.js already tracks goal view)
+    document.getElementById('payBtn').addEventListener('click', () => {
       window.location.href = 'payment-success.html';
-    }
-
-    // Attach click listener to whichever Pay button is visible
-    document.querySelectorAll("[data-ab-variant]").forEach(el => {
-      el.addEventListener('click', redirectToPayment);
     });
 
-    // Logout button listener
-    document.getElementById('logoutBtn').addEventListener('click', function() {
+    // ✅ Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
       localStorage.removeItem('username');
       window.location.href = 'index.html';
     });
