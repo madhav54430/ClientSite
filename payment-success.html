@@ -1,21 +1,5 @@
 <!-- payment-success.html -->
 <div id="payment-success">Thanks for your payment!</div>
 
-<script>
-  const testId = localStorage.getItem("ab_test_id");
-  const variant = localStorage.getItem(`ab_test_${testId}`);
-
-  if (testId && variant && document.querySelector('#payment-success')) {
-    fetch("http://localhost:8000/api/events/goal", {
-      method: "POST",
-      body: JSON.stringify({
-        test_id: parseInt(testId),
-        variant: variant,
-        timestamp: new Date().toISOString(),
-        page_url: window.location.href
-      }),
-      headers: { "Content-Type": "application/json" }
-    }).then(() => console.log("Goal logged"))
-      .catch(err => console.error("Goal error", err));
-  }
-</script>
+<!-- No need for inline JS here.
+     ab.js will detect #payment-success and log the goal automatically. -->
