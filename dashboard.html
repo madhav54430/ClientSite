@@ -5,18 +5,6 @@
   <title>Dashboard</title>
   <link rel="stylesheet" href="css/styles.css" />
 
-  <!-- Inject ab.js -->
-
-<script>
-  (function() {
-    var script = document.createElement('script');
-    script.src = "https://abtesting-frontend-madhavans-projects-3955d847.vercel.app/ab.js?test_id=2";
-    script.async = true;
-    document.head.appendChild(script);
-  })();
-</script>
-  
-
   <style>
     /* Common Pay button styles */
     #payBtn {
@@ -36,6 +24,37 @@
       color: white;
     }
   </style>
+
+  <!-- Define ABTestReady before loading ab.js -->
+<script>
+  window.ABTestReady = function (variant, config) {
+  const el = document.querySelector(config.selector);
+  if (!el) {
+    console.warn("[A/B Test] Element not found for selector:", config.selector);
+    return;
+  }
+
+  el.classList.remove('green', 'red');
+
+  if (variant === 'A') {
+    el.classList.add('green');
+  } else {
+    el.classList.add('red');
+  }
+
+  el.style.display = 'inline-block';
+};
+</script>
+
+  <!-- Load ab.js after ABTestReady is defined -->
+ <script>
+  (function() {
+    var script = document.createElement('script');
+    script.src = "https://abtesting-frontend-madhavans-projects-3955d847.vercel.app/ab.js?test_id=12";
+    script.async = true;
+    document.head.appendChild(script);
+  })();
+</script>
 </head>
 <body>
   <div class="dashboard">
@@ -55,24 +74,6 @@
     } else {
       document.getElementById('user').innerText = username;
     }
-
-    // ✅ Variant handler after ab.js loads
-    window.ABTestReady = function (variant, config) {
-      const payBtn = document.getElementById('payBtn');
-
-      // Remove existing color classes
-      payBtn.classList.remove('green', 'red');
-
-      // Apply variant styling
-      if (variant === 'A') {
-        payBtn.classList.add('green');
-      } else {
-        payBtn.classList.add('red');
-      }
-
-      // Show the button
-      payBtn.style.display = 'inline-block';
-    };
 
     // ✅ Pay button click = triggers goal page (ab.js already tracks goal view)
     document.getElementById('payBtn').addEventListener('click', () => {
