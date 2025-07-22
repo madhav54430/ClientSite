@@ -14,36 +14,31 @@
       display: none;
     }
 
-    #payBtn.green {
-      background-color: green;
-      color: white;
-    }
-
-    #payBtn.red {
-      background-color: red;
-      color: white;
-    }
   </style>
 
   <!-- Define ABTestReady before loading ab.js -->
 <script>
   window.ABTestReady = function (variant, config) {
-  const el = document.querySelector(config.selector);
-  if (!el) {
-    console.warn("[A/B Test] Element not found for selector:", config.selector);
-    return;
-  }
+    const el = document.querySelector(config.selector);
+    if (!el) {
+      console.warn("[A/B Test] Element not found for selector:", config.selector);
+      return;
+    }
 
-  el.classList.remove('green', 'red');
+    // Reset previously set styles
+    el.style.backgroundColor = '';
+    el.style.color = '';
+    el.style.display = 'inline-block';
 
-  if (variant === 'A') {
-    el.classList.add('green');
-  } else {
-    el.classList.add('red');
-  }
-
-  el.style.display = 'inline-block';
-};
+    // Apply styles based on variant
+    if (variant === 'A') {
+      el.style.backgroundColor = 'green';
+      el.style.color = 'white';
+    } else {
+      el.style.backgroundColor = 'red';
+      el.style.color = 'white';
+    }
+  };
 </script>
 
   <!-- Load ab.js after ABTestReady is defined -->
